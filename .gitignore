@@ -30,3 +30,13 @@
 
 # Eclipse project files
 *.project
+
+# Visual Studio project files
+*.vs
+*.sln
+*.VC.*
+*.vcxproj*
+
+# Build dirs
+/x64/
+/x86/
