@@ -1,5 +1,5 @@
-#ifndef ALGORITHM_BASE_HPP
-#define ALGORITHM_BASE_HPP
+#pragma once
+
 #include <vector>
 #include <memory>
 #include <queue>
@@ -14,18 +14,16 @@ class AlgorithmBase
 {
   public:
 	typedef std::pair<int, int> intPair;
-	AlgorithmBase(shared_ptr<Raster> raster_) :
-		raster(raster_),
-		parent(raster_->width * raster_->height, -INT_MAX) {};
-	~AlgorithmBase() {};
-	void shortestPath(const intPair& from, const intPair& to);
+	AlgorithmBase(Raster* raster_);
+	~AlgorithmBase();
+	void shortestPath(const intPair& from, const intPair& to) {};
 	void printPath(const intPair& begin, const intPair& from);
 
   protected:
-	inline int hash_(int i, int j) {return i*(raster->height) +j;};
-	inline intPair unhash_(int hash) {return std::make_pair(hash/(raster->height), hash%(raster->width));};
-	vector<int> parent;
-	shared_ptr<Raster> raster;
+	inline int hash_(int i, int j) {return i + j*(raster->getWidth());};
+	inline intPair unhash_(int hash) {return std::make_pair(hash%(raster->getWidth()), hash / (raster->getWidth()));};
+	int **parent;	//2D array with hashes
+	Raster* raster;
 };
 
 
@@ -35,11 +33,9 @@ class AlgorithmWithPriorityQueue : public AlgorithmBase
 	using AlgorithmBase::intPair;
 
   public:
-	AlgorithmWithPriorityQueue(shared_ptr<Raster> raster_) : AlgorithmBase(raster_) {}
-	~AlgorithmWithPriorityQueue() {};
+	AlgorithmWithPriorityQueue(Raster* raster_);
+	~AlgorithmWithPriorityQueue();
 
-  private:
-	vector<int> distance;
+  protected:
+	int** distance;	//priorities for queue
 };
-
-#endif

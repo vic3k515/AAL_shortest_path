@@ -6,7 +6,7 @@ class BFS : public AlgorithmBase
 {
 public:
 	using Location=AlgorithmBase::intPair;
-	BFS(shared_ptr<Raster> raster_) : AlgorithmBase(raster_) {};
+	BFS(Raster* raster_) : AlgorithmBase(raster_) {};
 	~BFS() {};
 
 	void shortestPath(const intPair& from, const intPair& to)
@@ -15,7 +15,7 @@ public:
 		queue.push(from);
 
 		int fromHash = hash_(from.first, from.second);
-		parent[fromHash] = fromHash;
+		parent[from.first][from.second] = fromHash;
 
 		while (!queue.empty())
 		{
@@ -28,12 +28,13 @@ public:
 				AlgorithmBase::printPath(from, to);
 			}
 
-			for (auto next : raster->neighbors(current))
+			for (auto next : raster->neighbours(current))
 			{
-			  if (parent[hash_(next.first, next.second)] == -INT_MAX)
+				//std::cout << "dupa" << std::endl;
+			  if (parent[next.first][next.second] == INT_MAX)
 			  {
 				  queue.push(next);
-				  parent[hash_(next.first, next.second)] = hash_(current.first, current.second);
+				  parent[next.first][next.second] = hash_(current.first, current.second);
 			  }
 			}
 		}

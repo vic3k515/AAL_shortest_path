@@ -1,23 +1,63 @@
 //#include "../include/Raster.hpp"
 #include "../include/BFS.hpp"
+#include "../include/Dijkstra.hpp"
+#include "../include/A_star.hpp"
 #include <iostream>
 #include <memory>
+#include <chrono>
 
-std::array<Raster::Location, 4> Raster::DIRS  {std::make_pair(1, 0), std::make_pair(0, -1),
-										 std::make_pair(-1, 0), std::make_pair(0, 1)};
+using namespace std;
+using namespace std::chrono;
+
+std::array<Raster::Location, 4> Raster::DIRS  {make_pair(1, 0), make_pair(0, -1),
+										 make_pair(-1, 0), make_pair(0, 1)};
 
 int main()
 {
 	int width, height;
-	std::cin >> width >> height;
-	std::shared_ptr<Raster> ptr(new Raster(width,height));
-	BFS bfs(ptr);
-	const std::pair<int,int> start = std::make_pair(3,0);
-	const std::pair<int,int> end = std::make_pair(7,8);
+	cin >> width >> height;
+	Raster* rptr = new Raster(width,height, false);
+	rptr->generateGrid(1,1);
+	rptr->draw();
+	BFS bfs(rptr);
+	A_star a_star(rptr);
+	Dijkstra dijkstra(rptr);
+	const std::pair<int, int> start = rptr->getStart();
+	const std::pair<int, int> end = rptr->getEnd();
 
-	std::cout << "Start: " << start.first << ", " << start.second << std::endl;
-	std::cout << "End: " << end.first << ", " << end.second << std::endl;
-	std::cout << "Shortest path (inversed): " << std::endl;
+	high_resolution_clock::time_point t1, t2;
+
+	cout << "Start: " << start.first << ", " << start.second << endl;
+	cout << "End: " << end.first << ", " << end.second << endl;
+
+	///* A* */
+	//cout << "Shortest path A_star(inversed): " << endl;
+	//t1 = high_resolution_clock::now();
+	//a_star.shortestPath(start, end);
+	//t2 = high_resolution_clock::now();
+	//auto duration = duration_cast<microseconds>(t2 - t1).count();
+	//cout << "A* exec time: " << duration << endl;
+
+	/* BFS */
+	cout << "Shortest path BFS(inversed): " << endl;
+	t1= high_resolution_clock::now();
 	bfs.shortestPath(start, end);
+	t2 = high_resolution_clock::now();
+	 auto duration = duration_cast<microseconds>(t2 - t1).count();
+	cout << "BFS exec time: " << duration << endl;
+
+
+
+	///* Dijkstra*/
+	//cout << "Shortest path Dijkstra(inversed): " << endl;
+	//t1 = high_resolution_clock::now();
+	//dijkstra.shortestPath(start, end);
+	//t2 = high_resolution_clock::now();
+	//duration = duration_cast<microseconds>(t2 - t1).count();
+	//cout << "Dijkstra exec time: " << duration << endl;
+
+
+	
+	delete rptr;
 	return 0;
 }

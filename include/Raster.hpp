@@ -1,66 +1,56 @@
-#ifndef RASTER_HPP
-#define RASTER_HPP
+#pragma once
+
 #include <array>
 #include <vector>
 #include <iostream>
+#include <stdlib.h>
+#include <time.h>
+#include <stack>
+#include <chrono>
+#include <random>
+#include <functional>
 
 using std::vector;
 using std::array;
 
-struct Raster
+class Raster
 {
+public:
 	typedef std::pair<int, int> Location;
 	static array<Location, 4> DIRS;
-	int width, height;
-	//unordered_set<Location> walls;
-	int **grid; //2D int array
 
+	Raster(int width_, int height_, bool from_cin = false);
+	~Raster();
 
-	Raster(int width_, int height_) : width(width_), height(height_)
-	{
-		grid = new int*[height_];
-		for (int i = 0; i < height_; ++i)
-			grid[i] = new int[width_]();
-
-		for (int i =0; i < height_; ++i)
-			for (int j =0; j < width_; ++j) {
-				std::cin >> grid[i][j];
-			}
-	}
-
-	~Raster()
-	{
-		for (int i = 0; i < height; ++i)
-			delete[] grid[i];
-		delete[] grid;
-	}
-
-	inline bool is_valid(Location id) const
+	//inlines
+	int getWidth() const { return width; }
+	int getHeight() const { return height; }
+	Location getStart() const { return start; }
+	Location getEnd() const { return end; }
+	bool is_valid(Location id) const
 	{
 		int x = id.first;
 		int y = id.second;
-		return 0 <= x && x < width && 0 <= y && y < height && grid[x][y] != 0;
+		return 0 <= x && x < height && 0 <= y && y < width && grid[x][y] != 0;
 	}
-
-	vector<Location> neighbors(Location id) const
+	bool is_wall(Location id) const
 	{
-		int x, y, dx, dy;
-		x = id.first;
-		y = id.second;
-		vector<Location> results;
-
-		for (auto dir : DIRS) {
-			dx = dir.first;
-			dy = dir.second;
-			Location next(x + dx, y + dy);
-			//if (in_bounds(next) && passable(next)) {
-			if (is_valid(next)) {
-				results.push_back(next);
-			}
-		}
-
-		return results;
+		int x = id.first;
+		int y = id.second;
+		return 0 <= x && x < height && 0 <= y && y < width && grid[x][y] != 1;
 	}
-};
 
-#endif
+	vector<Location> neighbours(Location id) const;
+	void createMaze(int start_x, int start_y, int v, int e);
+	void generateGrid(int vertices, int edges);
+	void draw();
+	void clear();
+
+	void neighbors2(Location curTile, vector<int>& moves, int field_width = 2);
+	void createMaze2(int row, int column, int vertices, int edges);
+
+private:
+	Location start = {0, 0}, end = {0, 0};
+	int width, height;
+	int **grid; //2D int array
+};
