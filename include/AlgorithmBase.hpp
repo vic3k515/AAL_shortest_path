@@ -40,10 +40,9 @@ class AlgorithmBase
 	void shortestPath(const intPair& from, const intPair& to) {};
 	void printPath(const intPair& begin, const intPair& from);
 	vector<intPair> getPath();
+	void clearParent();
 
   protected:
-	inline int hash_(int i, int j) {return i + j*(raster->getWidth());};
-	inline intPair unhash_(int hash) {return std::make_pair(hash%(raster->getWidth()), hash / (raster->getWidth()));};
 	intPair **parent;	//2D array with hashes
 	Raster* raster;
 };

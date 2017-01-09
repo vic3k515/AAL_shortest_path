@@ -1,17 +1,15 @@
-//#include "../include/Raster.hpp"
 #include "../include/BFS.hpp"
 #include "../include/Dijkstra.hpp"
 #include "../include/A_star.hpp"
 #include "../include/draw.hpp"
 #include <iostream>
-#include <memory>
 #include <chrono>
 
 using namespace std;
 using namespace std::chrono;
 
-std::array<Raster::Location, 4> Raster::DIRS  {make_pair(1, 0), make_pair(0, -1),
-										 make_pair(-1, 0), make_pair(0, 1)};
+//std::array<Raster::Location, 4> Raster::DIRS  {make_pair(1, 0), make_pair(0, -1),
+//										 make_pair(-1, 0), make_pair(0, 1)};
 
 void printParent(int **parent, int height, int width) {
 	for (int i = 0; i < height; ++i) {
@@ -31,8 +29,8 @@ int main()
 	int width, height;
 	cin >> width >> height;
 	Raster* rptr = new Raster(width,height, false);
-	rptr->generateGrid(1,1);
-	rptr->draw();
+	rptr->generateGrid(width * height, width * height);
+	//rptr->draw();
 	BFS bfs(rptr);
 	A_star a_star(rptr);
 	Dijkstra dijkstra(rptr);

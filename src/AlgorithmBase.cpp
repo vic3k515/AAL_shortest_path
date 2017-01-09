@@ -7,7 +7,7 @@ AlgorithmBase::AlgorithmBase(Raster* raster_) : raster(raster_)
 	for (int i = 0; i < raster->getHeight(); ++i)
 	{
 		parent[i] = new intPair[raster->getWidth()];
-		std::fill(parent[i], parent[i] + raster->getWidth(), intPair(INT_MAX,INT_MAX));
+		std::fill(parent[i], parent[i] + raster->getWidth(), nullPair);
 	}
 
 }
@@ -46,6 +46,14 @@ vector<AlgorithmBase::intPair> AlgorithmBase::getPath()
 	//std::reverse(path.begin(), path.end()); // not necessary for drawing
 	return path;
 	
+}
+
+void AlgorithmBase::clearParent()
+{
+	for (int i = 0; i < raster->getHeight(); ++i)
+	{
+		std::fill(parent[i], parent[i] + raster->getWidth(), nullPair);
+	}
 }
 
 AlgorithmWithPriorityQueue::AlgorithmWithPriorityQueue(Raster * raster_) : AlgorithmBase(raster_)

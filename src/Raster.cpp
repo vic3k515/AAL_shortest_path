@@ -1,5 +1,8 @@
 #include "../include/Raster.hpp"
 
+std::array<Raster::Location, 4> Raster::DIRS{ std::make_pair(1, 0), std::make_pair(0, -1),
+											  std::make_pair(-1, 0), std::make_pair(0, 1) };
+
 Raster::Raster(int width_, int height_, bool from_cin) : width(width_), height(height_)
 {
 	grid = new int*[height_];
@@ -62,14 +65,18 @@ void Raster::createMaze2(Location start, int v, int e)
 	std::stack<Location> tileList;
 	tileList.emplace(curTile);
 
+	int v_0 = v, e_0 = e;
+	// start was put
+	--v;
+
 	auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-	auto mt_rand = std::bind(std::uniform_int_distribution<int>(2, width/2), std::mt19937(seed));
+	auto mt_rand = std::bind(std::uniform_int_distribution<int>(1, 5), std::mt19937(seed));
 
 	// TODO: v and e should be checked first
-	while (!tileList.empty() && v>0 && e>0)
+	while (v>0 && e>0 && !tileList.empty())
 	{
 		/* randomize field_width value between 2,4,6,8 */
-		field_width = 3;
+		field_width = mt_rand();
 		//while(!(field_width%4==0))
 		//	field_width = mt_rand();
 
@@ -78,6 +85,9 @@ void Raster::createMaze2(Location start, int v, int e)
 
 		if (!moves.empty())
 		{
+			v -= field_width;
+			// TODO: find proper way to decrease edge count
+			e -= field_width;
 			Location temp;
 			switch (moves[0])
 			{
@@ -140,7 +150,7 @@ void Raster::createMaze2(Location start, int v, int e)
 		}
 		else
 		{
-			if (exitPlaced == false)
+			if (exitPlaced == false && v==v_0/2)
 			{
 				grid[curTile.first][curTile.second] = 1;
 				exitPlaced = true;
@@ -150,6 +160,13 @@ void Raster::createMaze2(Location start, int v, int e)
 			tileList.pop();
 		}
 	}
+	if (exitPlaced == false)
+	{
+		grid[curTile.first][curTile.second] = 1;
+		this->end = curTile;
+	}
+	// print number of vertices and edges used to build the maze:
+	std::cout << "v: " << v_0 - v << " e: " << e_0 - e << std::endl;
 }
 /* -------------*/
 vector<Raster::Location> Raster::neighbours(Location id) const
@@ -178,7 +195,7 @@ void Raster::generateGrid(int vertices, int edges)
 	int rand_y = mt_rand() % width;
 	this->start = Location(rand_x, rand_y);
 	grid[rand_x][rand_y] = 1;
-	std::cout << "GENERATOR start point: ("  << rand_x << "," << rand_y << ")" << std::endl;
+	//std::cout << "GENERATOR start point: ("  << rand_x << "," << rand_y << ")" << std::endl;
  	createMaze2(this->start, vertices, edges);
 }
 
