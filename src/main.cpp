@@ -2,6 +2,7 @@
 #include "../include/BFS.hpp"
 #include "../include/Dijkstra.hpp"
 #include "../include/A_star.hpp"
+#include "../include/draw.hpp"
 #include <iostream>
 #include <memory>
 #include <chrono>
@@ -43,34 +44,33 @@ int main()
 	cout << "Start: " << start.first << ", " << start.second << endl;
 	cout << "End: " << end.first << ", " << end.second << endl;
 
-	///* A* */
-	//cout << "Shortest path A_star(inversed): " << endl;
-	//t1 = high_resolution_clock::now();
-	//a_star.shortestPath(start, end);
-	//t2 = high_resolution_clock::now();
-	//auto duration = duration_cast<microseconds>(t2 - t1).count();
-	//cout << "A* exec time: " << duration << endl;
+	/* A* */
+	cout << "Shortest path A_star(inversed): " << endl;
+	t1 = high_resolution_clock::now();
+	a_star.shortestPath(start, end);
+	t2 = high_resolution_clock::now();
+	auto duration = duration_cast<microseconds>(t2 - t1).count();
+	cout << "A* exec time: " << duration << endl;
 
 	/* BFS */
 	cout << "Shortest path BFS(inversed): " << endl;
 	t1= high_resolution_clock::now();
 	bfs.shortestPath(start, end);
 	t2 = high_resolution_clock::now();
-	 auto duration = duration_cast<microseconds>(t2 - t1).count();
+	duration = duration_cast<microseconds>(t2 - t1).count();
 	cout << "BFS exec time: " << duration << endl;
 
-
-
-	///* Dijkstra*/
-	//cout << "Shortest path Dijkstra(inversed): " << endl;
-	//t1 = high_resolution_clock::now();
-	//dijkstra.shortestPath(start, end);
-	//t2 = high_resolution_clock::now();
-	//duration = duration_cast<microseconds>(t2 - t1).count();
-	//cout << "Dijkstra exec time: " << duration << endl;
-
-
+	/* Dijkstra*/
+	cout << "Shortest path Dijkstra(inversed): " << endl;
+	t1 = high_resolution_clock::now();
+	dijkstra.shortestPath(start, end);
+	t2 = high_resolution_clock::now();
+	duration = duration_cast<microseconds>(t2 - t1).count();
+	cout << "Dijkstra exec time: " << duration << endl;
 	
+	vector<pair<int, int>> shortest_path = bfs.getPath();
+	drawResult(width, height, rptr, shortest_path);
+
 	delete rptr;
 	return 0;
 }

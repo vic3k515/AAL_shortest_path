@@ -3,11 +3,11 @@
 
 AlgorithmBase::AlgorithmBase(Raster* raster_) : raster(raster_)
 {
-	parent = new int*[raster->getHeight()];
+	parent = new intPair*[raster->getHeight()];
 	for (int i = 0; i < raster->getHeight(); ++i)
 	{
-		parent[i] = new int[raster->getWidth()];
-		std::fill(parent[i], parent[i] + raster->getWidth(), INT_MAX);
+		parent[i] = new intPair[raster->getWidth()];
+		std::fill(parent[i], parent[i] + raster->getWidth(), intPair(INT_MAX,INT_MAX));
 	}
 
 }
@@ -21,29 +21,31 @@ AlgorithmBase::~AlgorithmBase()
 
 void AlgorithmBase::printPath(const intPair& begin, const intPair& from)
 {
-	//for (int i = 0; i < raster->height; ++i)
-	//{
-	//	for (int j = 0; j < raster->width; ++j) {
-	//		if (parent[i][j] != -INT_MAX)
-	//			std::cout << parent[i][j];
-	//		else
-	//			std::cout << "  ";
-	//		std::cout << " ";
-	//	}
-	//	std::cout << std::endl;
-	//}
-
 	int count = 0;
 	intPair curr = from;
 	while(curr != begin)
 	{
 		std::cout << "(" << curr.first << "," << curr.second << ") -> ";
-		//curr = unhash_(parent[hash_(curr.first, curr.second)]);
-		curr = unhash_(parent[curr.first][curr.second]);
+		curr = parent[curr.first][curr.second];
 		++count;
 	}
 	std::cout << "(" << begin.first << "," << begin.second << ")" << std::endl;
 	std::cout << " Length = " << count << std::endl;
+}
+
+vector<AlgorithmBase::intPair> AlgorithmBase::getPath()
+{
+	vector<intPair> path;
+	intPair current = raster->getEnd();
+	//path.push_back(current); // not included for drawing (end already drown)
+	while (current != raster->getStart()) {
+		path.push_back(current);
+		current = parent[current.first][current.second];
+	}
+	//path.push_back(raster->getStart()); // optional
+	//std::reverse(path.begin(), path.end()); // not necessary for drawing
+	return path;
+	
 }
 
 AlgorithmWithPriorityQueue::AlgorithmWithPriorityQueue(Raster * raster_) : AlgorithmBase(raster_)

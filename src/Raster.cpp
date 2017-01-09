@@ -54,13 +54,13 @@ void Raster::neighbors2(Location curTile, vector<int>& moves, int magic_number)
 }
 
 
-void Raster::createMaze2(int s_x, int s_y, int v, int e)
+void Raster::createMaze2(Location start, int v, int e)
 {
 	bool exitPlaced = false;
 	int field_width;
-	Location curTile = Location(s_x, s_y);
+	Location curTile = start;
 	std::stack<Location> tileList;
-	tileList.push(curTile);
+	tileList.emplace(curTile);
 
 	auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 	auto mt_rand = std::bind(std::uniform_int_distribution<int>(2, width/2), std::mt19937(seed));
@@ -89,8 +89,7 @@ void Raster::createMaze2(int s_x, int s_y, int v, int e)
 				{
 					grid[curTile.first + i][curTile.second] = 1;
 				}
-				//grid[curTile.second - 1][curTile.first] = 1;
-				//grid[curTile.second - 2][curTile.first] = 1;
+
 				curTile = temp;
 				tileList.push(curTile);
 
@@ -104,8 +103,7 @@ void Raster::createMaze2(int s_x, int s_y, int v, int e)
 				{
 					grid[curTile.first - i][curTile.second] = 1;
 				}
-				//grid[curTile.second + 1][curTile.first] = 1;
-				//grid[curTile.second + 2][curTile.first] = 1;
+
 				curTile = temp;
 				tileList.push(curTile);
 
@@ -120,8 +118,6 @@ void Raster::createMaze2(int s_x, int s_y, int v, int e)
 					grid[curTile.first][curTile.second - i] = 1;
 				}
 
-				//grid[curTile.second][curTile.first - 1] = 1;
-				//grid[curTile.second][curTile.first - 2] = 1;
 				curTile = temp;
 				tileList.push(curTile);
 
@@ -136,8 +132,6 @@ void Raster::createMaze2(int s_x, int s_y, int v, int e)
 					grid[curTile.first][curTile.second + i] = 1;
 				}
 
-				//grid[curTile.second][curTile.first + 1] = 1;
-				//grid[curTile.second][curTile.first + 2] = 1;
 				curTile = temp;
 				tileList.push(curTile);
 
@@ -156,9 +150,6 @@ void Raster::createMaze2(int s_x, int s_y, int v, int e)
 			tileList.pop();
 		}
 	}
-
-
-
 }
 /* -------------*/
 vector<Raster::Location> Raster::neighbours(Location id) const
@@ -178,44 +169,9 @@ vector<Raster::Location> Raster::neighbours(Location id) const
 	}
 	return results;
 }
-/*
-void Raster::createMaze(int start_x, int start_y, int v, int e)
-{
-	std::stack<Location> s;
-	Location curr = Location(start_x, start_y);
-	s.push(curr);
-	bool exitPlaced = false;
 
-	while (!s.empty() && v > 0 && e > 0)
-	{
-
-		vector<Location> moves = neighbours(curr);
-		std::random_shuffle(moves.begin(), moves.end());
-
-		if (!moves.empty())
-		{
-			Location next = moves[0];
-			grid[next.first][next.second] = 1;
-			curr = next;
-			s.push(curr);
-		}
-		else
-		{
-			if (exitPlaced == false)
-			{
-				exitPlaced = true;
-				this->end = curr;
-			}
-			curr = s.top();
-			s.pop();
-		}
-
-	}
-}
-*/
 void Raster::generateGrid(int vertices, int edges)
 {
-	//srand(time(NULL));
 	auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 	std::mt19937 mt_rand(seed);
 	int rand_x = mt_rand() % height;
@@ -223,29 +179,18 @@ void Raster::generateGrid(int vertices, int edges)
 	this->start = Location(rand_x, rand_y);
 	grid[rand_x][rand_y] = 1;
 	std::cout << "GENERATOR start point: ("  << rand_x << "," << rand_y << ")" << std::endl;
-	//createMaze(rand_x, rand_y, vertices, edges);
- 	createMaze2(rand_x, rand_y, vertices, edges);
+ 	createMaze2(this->start, vertices, edges);
 }
 
 void Raster::draw()
 {
-	//// print top ruler
-	//std::cout << "  ";
-	//for (int row = 0; row < width; ++row)
-	//	std::cout << "A";
-
-	std::cout << std::endl;
 	for (int i = 0; i < height; ++i)
 	{
-		// print left ruler
-		//std::cout << "." << " ";
 		for (int j = 0; j < width; ++j)
 		{
 			if (i == this->start.first && j == start.second)
-				//std::cout << grid[i][j] << "";
 				std::cout << "S";
 			else if (i == this->end.first && j == end.second)
-				//std::cout << grid[i][j] << "";
 				std::cout << "E";
 			else if (grid[i][j] == 0)
 				std::cout << " ";

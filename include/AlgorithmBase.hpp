@@ -9,20 +9,42 @@
 using std::vector;
 using std::shared_ptr;
 using std::priority_queue;
+using std::pair;
+
+template<typename T, typename priority_t>
+struct PriorityQueue {
+	typedef pair<priority_t, T> PQElement;
+	priority_queue<PQElement, vector<PQElement>,
+		std::greater<PQElement>> elements;
+
+	inline bool empty() const { return elements.empty(); }
+
+	inline void put(T item, priority_t priority) {
+		elements.emplace(priority, item);
+	}
+
+	inline T get() {
+		T best_item = elements.top().second;
+		elements.pop();
+		return best_item;
+	}
+};
 
 class AlgorithmBase
 {
   public:
-	typedef std::pair<int, int> intPair;
+	typedef pair<int, int> intPair;
+	const intPair nullPair = intPair(INT_MAX,INT_MAX);
 	AlgorithmBase(Raster* raster_);
 	~AlgorithmBase();
 	void shortestPath(const intPair& from, const intPair& to) {};
 	void printPath(const intPair& begin, const intPair& from);
+	vector<intPair> getPath();
 
   protected:
 	inline int hash_(int i, int j) {return i + j*(raster->getWidth());};
 	inline intPair unhash_(int hash) {return std::make_pair(hash%(raster->getWidth()), hash / (raster->getWidth()));};
-	int **parent;	//2D array with hashes
+	intPair **parent;	//2D array with hashes
 	Raster* raster;
 };
 

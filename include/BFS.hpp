@@ -12,31 +12,28 @@ public:
 	void shortestPath(const intPair& from, const intPair& to)
 	{
 		queue<Location> queue;
-		queue.push(from);
-
-		int fromHash = hash_(from.first, from.second);
-		parent[from.first][from.second] = fromHash;
+		queue.emplace(from);
+		parent[from.first][from.second] = from;
 
 		while (!queue.empty())
 		{
 			auto current = queue.front();
 			queue.pop();
-			//std::cout << current.first << current.second << std::endl;
 
-			if (current.first == to.first && current.second == to.second)
+			if (current == to)
 			{
-				AlgorithmBase::printPath(from, to);
+				//AlgorithmBase::printPath(from, to);
+				break;
 			}
 
 			for (auto next : raster->neighbours(current))
 			{
-				//std::cout << "dupa" << std::endl;
-			  if (parent[next.first][next.second] == INT_MAX)
+			  if (parent[next.first][next.second] == nullPair)
 			  {
-				  queue.push(next);
-				 auto temp =   hash_(current.first, current.second);
-				 std::cout << temp << std::endl;
-				   parent[next.first][next.second] = temp;
+				  queue.emplace(next);
+				 //std::cout << temp << " c: (" << current.first << "," << current.second << ") "  << " c_un: (" << temp1.first << "," << temp1.second << ") "
+					// << raster->getVal(temp1) << " n: (" << next.first << "," << next.second << ") " << raster->getVal(next) << std::endl;
+				  parent[next.first][next.second] = current;
 			  }
 			}
 		}
