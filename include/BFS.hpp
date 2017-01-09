@@ -34,7 +34,9 @@ public:
 			  if (parent[next.first][next.second] == INT_MAX)
 			  {
 				  queue.push(next);
-				  parent[next.first][next.second] = hash_(current.first, current.second);
+				 auto temp =   hash_(current.first, current.second);
+				 std::cout << temp << std::endl;
+				   parent[next.first][next.second] = temp;
 			  }
 			}
 		}

@@ -30,9 +30,9 @@ class AlgorithmBase
 
 class AlgorithmWithPriorityQueue : public AlgorithmBase
 {
+  public:
 	using AlgorithmBase::intPair;
 
-  public:
 	AlgorithmWithPriorityQueue(Raster* raster_);
 	~AlgorithmWithPriorityQueue();
 

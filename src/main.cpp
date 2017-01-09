@@ -12,6 +12,19 @@ using namespace std::chrono;
 std::array<Raster::Location, 4> Raster::DIRS  {make_pair(1, 0), make_pair(0, -1),
 										 make_pair(-1, 0), make_pair(0, 1)};
 
+void printParent(int **parent, int height, int width) {
+	for (int i = 0; i < height; ++i) {
+		for (int j = 0; j < width; ++j)
+			if (parent[i][j] == INT_MAX)
+				std::cout << "M" << " ";
+			else if (parent[i][j] >= width*height)
+				std::cout << "@" << " ";
+			else
+				std::cout << parent[i][j] << " ";;
+		std::cout << std::endl;
+	}
+}
+
 int main()
 {
 	int width, height;

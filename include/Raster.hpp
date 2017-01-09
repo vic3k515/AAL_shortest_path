@@ -9,6 +9,7 @@
 #include <chrono>
 #include <random>
 #include <functional>
+#include <algorithm>
 
 using std::vector;
 using std::array;
