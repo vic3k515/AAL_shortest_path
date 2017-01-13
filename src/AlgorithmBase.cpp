@@ -37,12 +37,16 @@ vector<AlgorithmBase::intPair> AlgorithmBase::getPath()
 {
 	vector<intPair> path;
 	intPair current = raster->getEnd();
-	//path.push_back(current); // not included for drawing (end already drown)
 	while (current != raster->getStart()) {
 		path.push_back(current);
+		if (current.first == nullPair.first || current.second == nullPair.second)
+		{
+			std::cout << "AlgorithmBase::getPath() error: wrong parent detected!" << std::endl;
+			return vector<intPair>();
+		}
 		current = parent[current.first][current.second];
 	}
-	//path.push_back(raster->getStart()); // optional
+	//path.push_back(raster->getStart()); // optional, not preffered when drawing image
 	//std::reverse(path.begin(), path.end()); // not necessary for drawing
 	return path;
 	

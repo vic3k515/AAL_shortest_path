@@ -5,8 +5,12 @@
 
 using namespace cimg_library;
 
-void drawResult(int width, int height, Raster* rptr, std::vector<std::pair<int,int>>& path, int pixel_size = 10)
+/* Draws black and white image with size width x height of raster pointed by rptr 
+   and shortest path between raster's start and end points given in path parameter.
+   Each point of raster will have size of pixel_size. */
+void drawResult(int width, int height, Raster* rptr, std::vector<std::pair<int,int>>& path, int pixel_size = 30)
 {
+	// Create display object and initialize its pixels with 0s = black color
 	CImgDisplay
 		draw_disp(pixel_size* width, height * pixel_size, "Shortest Path", 0);
 
@@ -38,11 +42,13 @@ void drawResult(int width, int height, Raster* rptr, std::vector<std::pair<int,i
 				img.draw_rectangle(x, y, x + pixel_size, y + pixel_size, white, 1);
 		}
 
-	for (auto it = path.begin() + 1; it != path.end(); ++it)
-	{
-		int y = ((*it).first)*pixel_size, x = ((*it).second)*pixel_size;
-		img.draw_rectangle(x, y, x + pixel_size, y + pixel_size, blue, 1);
-	}
+	// Start drawing path from 2nd item, because end is already drown
+	if(path.size()>1)
+		for (auto it = path.begin() + 1; it != path.end(); ++it)
+		{
+			int y = ((*it).first)*pixel_size, x = ((*it).second)*pixel_size;
+			img.draw_rectangle(x, y, x + pixel_size, y + pixel_size, blue, 1);
+		}
 
 	img.display(draw_disp);
 	while (!draw_disp.is_closed() && !draw_disp.is_keyESC() && !draw_disp.is_keyQ())

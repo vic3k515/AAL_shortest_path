@@ -20,7 +20,7 @@ public:
 	typedef std::pair<int, int> Location;
 	static array<Location, 4> DIRS;
 
-	Raster(int width_, int height_, bool from_cin = false);
+	Raster(int width_, int height_);
 	~Raster();
 
 	//inlines
@@ -39,17 +39,18 @@ public:
 	{
 		int x = id.first;
 		int y = id.second;
-		return 0 <= x && x < height && 0 <= y && y < width && grid[x][y] != 1;
+		return 0 <= x && x < height && 0 <= y && y < width && grid[x][y] == 0;
 	}
 
-	vector<Location> neighbours(Location id) const;
-	void createMaze(int start_x, int start_y, int v, int e);
-	void generateGrid(int vertices, int edges);
+	bool readStartAndEnd();
+	bool readGrid();
+	void generateGrid(int& vertices, int& edges);
 	void draw();
 	void clear();
-
 	void neighbors2(Location curTile, vector<int>& moves, int field_width = 2);
-	void createMaze2(Location start_point, int vertices, int edges);
+	void createMaze(Location start_point, int& vertices, int& edges);
+	int countNewEdges(Location loc);
+	vector<Location> neighbours(Location id) const;
 
 private:
 	Location start = {0, 0}, end = {0, 0};
