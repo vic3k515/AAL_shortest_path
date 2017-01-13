@@ -8,7 +8,7 @@ using namespace cimg_library;
 /* Draws black and white image with size width x height of raster pointed by rptr 
    and shortest path between raster's start and end points given in path parameter.
    Each point of raster will have size of pixel_size. */
-void drawResult(int width, int height, Raster* rptr, std::vector<std::pair<int,int>>& path, int pixel_size = 30)
+void drawResult(int width, int height, Raster* rptr, std::vector<std::pair<int,int>>& path, int pixel_size = 10)
 {
 	// Create display object and initialize its pixels with 0s = black color
 	CImgDisplay

@@ -17,12 +17,12 @@ void printParent(int **parent, int height, int width) {
 	for (int i = 0; i < height; ++i) {
 		for (int j = 0; j < width; ++j)
 			if (parent[i][j] == INT_MAX)
-				std::cout << "M" << " ";
+				cout << "M" << " ";
 			else if (parent[i][j] >= width*height)
-				std::cout << "@" << " ";
+				cout << "@" << " ";
 			else
-				std::cout << parent[i][j] << " ";;
-		std::cout << std::endl;
+				cout << parent[i][j] << " ";;
+		cout << std::endl;
 	}
 }
 */
@@ -69,7 +69,7 @@ void runAlgorithms(Raster* rptr, bool benchmark, vector<int>* bench_info=nullptr
 		t1 = high_resolution_clock::now();
 		bfs.shortestPath(start, end);
 		t2 = high_resolution_clock::now();
-		auto duration = duration_cast<microseconds>(t2 - t1).count();
+		auto duration = duration_cast<milliseconds>(t2 - t1).count();
 		bench_info->push_back(duration);
 		cout << "BFS exec time: " << duration << endl;
 	}
@@ -86,7 +86,7 @@ void runAlgorithms(Raster* rptr, bool benchmark, vector<int>* bench_info=nullptr
 		t1 = high_resolution_clock::now();
 		dijkstra.shortestPath(start, end);
 		t2 = high_resolution_clock::now();
-		auto duration = duration_cast<microseconds>(t2 - t1).count();
+		auto duration = duration_cast<milliseconds>(t2 - t1).count();
 		bench_info->push_back(duration);
 		cout << "Dijkstra exec time: " << duration << endl;
 	}
@@ -103,7 +103,7 @@ void runAlgorithms(Raster* rptr, bool benchmark, vector<int>* bench_info=nullptr
 		t1 = high_resolution_clock::now();
 		a_star.shortestPath(start, end);
 		t2 = high_resolution_clock::now();
-		auto duration = duration_cast<microseconds>(t2 - t1).count();
+		auto duration = duration_cast<milliseconds>(t2 - t1).count();
 		bench_info->push_back(duration);
 		cout << "A* exec time: " << duration << endl;
 	}
@@ -180,7 +180,8 @@ void benchmarkMode()
 	char fill = ' ';
 	int width = 10;
 	int v, e, median, time_bfs, time_dijkstra, time_a_star, q,
-		T_med, t_med, q_med, v_med, e_med, T;
+		t_med, q_med, v_med, e_med, T;
+	double T_med;
 
 	// organize benchamrk results into buckets
 	for (auto it = results.begin(); it != results.end(); ++it)
@@ -218,28 +219,71 @@ void benchmarkMode()
 	// BFS - O(V+E)
 	T_med = v_med + e_med;
 	t_med = bfs_times[median];
-	double constant = (double)T_med / (double)t_med;
+	double constant = T_med / (double)t_med;
 
 	bfs_q[median] = 1.0;
-	for (int i = 0; i < vertices.size(); ++i)
+	for (int i = 0; i < no_test; ++i)
 	{
 		if (i == median) continue;
 		T = vertices[i] + edges[i];
-		q = (double)bfs_times[i] * constant;
+		q = ((double)bfs_times[i]) * constant;
 		bfs_q[i] = q / T;
 	}
 
-	cout << "BFS O(V+E)" << endl;
-	std::cout << "V" << std::setw(width) << std::setfill(fill);
-	std::cout << "E" << std::setw(width) << std::setfill(fill);
-	std::cout << "t(n)[us]" << std::setw(width) << std::setfill(fill);
-	std::cout << "q(n)" << std::setw(width) << std::setfill(fill) << endl;
-	for (int i = 0; i < vertices.size(); ++i)
+	// Dijkstra - O(E*logV)
+	T_med = (double)e_med * log((double)v_med);
+	t_med = dijkstra_times[median];
+	constant = T_med / (double)t_med;
+
+	dijkstra_q[median] = 1.0;
+	for (int i = 0; i < no_test; ++i)
 	{
-		std::cout << std::left << vertices[i] << std::setw(width) << std::setfill(fill);
-		std::cout << std::left << edges[i] << std::setw(width) << std::setfill(fill);
-		std::cout << std::left << bfs_times[i] << std::setw(width) << std::setfill(fill);
-		std::cout << std::left << std::fixed << bfs_q[i] << std::setw(width) << std::setfill(fill) << endl;
+		if (i == median) continue;
+		T = (double)edges[i] * log((double)vertices[i]);
+		q = (double)dijkstra_times[i] * constant;
+		bfs_q[i] = q / T;
+	}
+
+	// A* - O(E)
+	T_med = e_med;
+	t_med = a_star_times[median];
+	constant = T_med / (double)t_med;
+
+	a_star_q[median] = 1.0;
+	for (int i = 0; i < no_test; ++i)
+	{
+		if (i == median) continue;
+		T = edges[i];
+		q = (double)a_star_times[i] * constant;
+		a_star_q[i] = q / T;
+	}
+
+	char* alg_names[3] = { "BFS O(V+E)" , "Dijkstra O(E*logV)" , "A* O(E)" };
+
+	for (int k = 0; k < 3; ++k)
+	{
+		cout << endl << alg_names[k] << endl;
+		cout << left << setw(width) << setfill(fill) << "V";
+		cout << left  << setw(width) << setfill(fill) << "E";
+		cout << left  << setw(width) << setfill(fill) << "t(n)[ms]";
+		cout << left  << setw(width) << setfill(fill) << "q(n)" << endl;
+		for (int i = 0; i < no_test; ++i)
+		{
+			cout << std::left << setw(width) << setfill(fill) << vertices[i];
+			cout << std::left << setw(width) << setfill(fill) << edges[i];
+			if(k==0)
+				cout << std::left << setw(width) << setfill(fill) << bfs_times[i];
+			else if(k==1)
+				cout << std::left << setw(width) << setfill(fill) << dijkstra_times[i];
+			else
+				cout << std::left << setw(width) << setfill(fill) << a_star_times[i];
+			if(k==0)
+				cout << std::left << std::fixed << setw(width) << setfill(fill) << bfs_q[i] << endl;
+			else if(k==1)
+				cout << std::left << std::fixed << setw(width) << setfill(fill) << dijkstra_q[i] << endl;
+			else
+				cout << std::left << std::fixed << setw(width) << setfill(fill) << a_star_q[i] << endl;
+		}
 	}
 }
 
@@ -277,44 +321,6 @@ int main(int argc, char* argv[])
 		exit(0);
 	}
 
-	//start = rptr->getStart();
-	//end = rptr->getEnd();
-
-	////rptr->draw();
-	//BFS bfs(rptr);
-	//A_star a_star(rptr);
-	//Dijkstra dijkstra(rptr);
-
-
-	//high_resolution_clock::time_point t1, t2;
-
-	//cout << "Start: " << start.first << ", " << start.second << endl;
-	//cout << "End: " << end.first << ", " << end.second << endl;
-
-	///* A* */
-	//cout << "Shortest path A_star(inversed): " << endl;
-	//t1 = high_resolution_clock::now();
-	//a_star.shortestPath(start, end);
-	//t2 = high_resolution_clock::now();
-	//auto duration = duration_cast<microseconds>(t2 - t1).count();
-	//cout << "A* exec time: " << duration << endl;
-
-	///* BFS */
-	//cout << "Shortest path BFS(inversed): " << endl;
-	//t1= high_resolution_clock::now();
-	//bfs.shortestPath(start, end);
-	//t2 = high_resolution_clock::now();
-	//duration = duration_cast<microseconds>(t2 - t1).count();
-	//cout << "BFS exec time: " << duration << endl;
-
-	///* Dijkstra*/
-	//cout << "Shortest path Dijkstra(inversed): " << endl;
-	//t1 = high_resolution_clock::now();
-	//dijkstra.shortestPath(start, end);
-	//t2 = high_resolution_clock::now();
-	//duration = duration_cast<microseconds>(t2 - t1).count();
-	//cout << "Dijkstra exec time: " << duration << endl;
-	
 	delete rptr;
 	return 0;
 }
