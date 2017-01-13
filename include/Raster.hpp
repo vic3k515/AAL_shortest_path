@@ -33,7 +33,7 @@ public:
 	{
 		int x = id.first;
 		int y = id.second;
-		return 0 <= x && x < height && 0 <= y && y < width && grid[x][y] != 0;
+		return 0 <= x && x < height && 0 <= y && y < width && grid[x][y] == 1;
 	}
 	bool is_wall(Location id) const
 	{
@@ -47,7 +47,7 @@ public:
 	void generateGrid(int& vertices, int& edges);
 	void draw();
 	void clear();
-	void neighbors2(Location curTile, vector<int>& moves, int field_width = 2);
+	void neighbors2(Location curTile, vector<int>& moves, int field_width);
 	void createMaze(Location start_point, int& vertices, int& edges);
 	int countNewEdges(Location loc);
 	vector<Location> neighbours(Location id) const;
