@@ -5,7 +5,7 @@
 
 using namespace cimg_library;
 
-/* Draws black and white image with size width x height of raster pointed by rptr 
+/* Draws black and white image with size width x height of raster pointed by rptr
    and shortest path between raster's start and end points given in path parameter.
    Each point of raster will have size of pixel_size. */
 void drawResult(int width, int height, Raster* rptr, std::vector<std::pair<int,int>>& path, int pixel_size = 10)
@@ -29,7 +29,7 @@ void drawResult(int width, int height, Raster* rptr, std::vector<std::pair<int,i
 	CImg<unsigned char> img(draw_disp.width(), draw_disp.height(), 1, 3, 0);
 
 	for (int i = rptr->getHeight() - 1; i >= 0; --i)
-		for (int j = rptr->getWidth(); j >= 0; --j)
+		for (int j = rptr->getWidth() - 1; j >= 0; --j)
 		{
 			std::pair<int, int> tmp = std::make_pair(i, j);
 			int y = i*pixel_size, x = j*pixel_size;

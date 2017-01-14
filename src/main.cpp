@@ -9,6 +9,7 @@
 using namespace std;
 using namespace std::chrono;
 
+static bool disable_draw = false;
 
 //std::array<Raster::Location, 4> Raster::DIRS  {make_pair(1, 0), make_pair(0, -1),
 //										 make_pair(-1, 0), make_pair(0, 1)};
@@ -28,9 +29,13 @@ void printParent(int **parent, int height, int width) {
 */
 void printUsage(char* prog)
 {
-	cout << "usage: " << prog << " n, where n is a mode number. Modes: "
-		<< "1 - raster loaded from stdin, 2 - raster auto-generated with given width, height, "
-		<< "number of vertices and edges, 3 - benchmark mode." << endl;
+	cout << "usage: " << prog << " n <-nd>, where n is a mode number." << endl
+		<< "Modes:" << endl
+		<< "1 - raster loaded from stdin," << endl
+		<< "2 - raster auto-generated with given width, height, "
+		<< "number of vertices and edges," << endl
+		<< "3 - benchmark mode (mode 2 with exec time measurement)." << endl
+		<< "-nd - disables image drawing."<< endl;
 }
 /*
 void runBFS(Raster* rptr, Raster::Location start, Raster::Location end)
@@ -69,7 +74,7 @@ void runAlgorithms(Raster* rptr, bool benchmark, vector<int>* bench_info=nullptr
 		t1 = high_resolution_clock::now();
 		bfs.shortestPath(start, end);
 		t2 = high_resolution_clock::now();
-		auto duration = duration_cast<milliseconds>(t2 - t1).count();
+		auto duration = duration_cast<microseconds>(t2 - t1).count();
 		bench_info->push_back(duration);
 		cout << "BFS exec time: " << duration << endl;
 	}
@@ -78,7 +83,8 @@ void runAlgorithms(Raster* rptr, bool benchmark, vector<int>* bench_info=nullptr
 	vector<Raster::Location> shortest_path_1 = bfs.getPath();
 	cout << "Shortest path BFS(inversed): " << endl
 		<< "length: " << shortest_path_1.size() << endl;
-	drawResult(width, height, rptr, shortest_path_1);
+	if(!disable_draw)
+		drawResult(width, height, rptr, shortest_path_1);
 
 	/* Dijkstra*/
 	if (benchmark && bench_info != nullptr)
@@ -86,7 +92,7 @@ void runAlgorithms(Raster* rptr, bool benchmark, vector<int>* bench_info=nullptr
 		t1 = high_resolution_clock::now();
 		dijkstra.shortestPath(start, end);
 		t2 = high_resolution_clock::now();
-		auto duration = duration_cast<milliseconds>(t2 - t1).count();
+		auto duration = duration_cast<microseconds>(t2 - t1).count();
 		bench_info->push_back(duration);
 		cout << "Dijkstra exec time: " << duration << endl;
 	}
@@ -95,7 +101,8 @@ void runAlgorithms(Raster* rptr, bool benchmark, vector<int>* bench_info=nullptr
 	vector<Raster::Location> shortest_path_2 = dijkstra.getPath();
 	cout << "Shortest path Dijkstra(inversed): " << endl
 		<< "length: " << shortest_path_2.size() << endl;
-	drawResult(width, height, rptr, shortest_path_2);
+	if(!disable_draw)
+		drawResult(width, height, rptr, shortest_path_2);
 
 	/* A* */
 	if (benchmark && bench_info != nullptr)
@@ -103,7 +110,7 @@ void runAlgorithms(Raster* rptr, bool benchmark, vector<int>* bench_info=nullptr
 		t1 = high_resolution_clock::now();
 		a_star.shortestPath(start, end);
 		t2 = high_resolution_clock::now();
-		auto duration = duration_cast<milliseconds>(t2 - t1).count();
+		auto duration = duration_cast<microseconds>(t2 - t1).count();
 		bench_info->push_back(duration);
 		cout << "A* exec time: " << duration << endl;
 	}
@@ -112,7 +119,8 @@ void runAlgorithms(Raster* rptr, bool benchmark, vector<int>* bench_info=nullptr
 	vector<Raster::Location> shortest_path_3 = a_star.getPath();
 	cout << "Shortest path A*(inversed): " << endl
 		<< "length: " << shortest_path_3.size() << endl;
-	drawResult(width, height, rptr, shortest_path_3);
+	if(!disable_draw)
+		drawResult(width, height, rptr, shortest_path_3);
 }
 
 void fromStdinMode()
@@ -183,7 +191,7 @@ void benchmarkMode()
 		t_med, q_med, v_med, e_med, T;
 	double T_med;
 
-	// organize benchamrk results into buckets
+	// organize benchmark results into buckets
 	for (auto it = results.begin(); it != results.end(); ++it)
 	{
 		vertices.push_back(*it++);
@@ -212,15 +220,15 @@ void benchmarkMode()
 	q = (t(n) * T(n_median) / (T(n) * t(n_median))
 	*/
 
-	bfs_q.resize(vertices.size());
-	dijkstra_q.resize(vertices.size());
-	a_star_q.resize(vertices.size());
+	bfs_q.resize(no_test);
+	dijkstra_q.resize(no_test);
+	a_star_q.resize(no_test);
 
 	// BFS - O(V+E)
 	T_med = v_med + e_med;
 	t_med = bfs_times[median];
 	double constant = T_med / (double)t_med;
-
+	cout << "BFS c: " << constant << endl;
 	bfs_q[median] = 1.0;
 	for (int i = 0; i < no_test; ++i)
 	{
@@ -234,7 +242,7 @@ void benchmarkMode()
 	T_med = (double)e_med * log((double)v_med);
 	t_med = dijkstra_times[median];
 	constant = T_med / (double)t_med;
-
+	cout << "Dijkstra c: " << constant << endl;
 	dijkstra_q[median] = 1.0;
 	for (int i = 0; i < no_test; ++i)
 	{
@@ -248,7 +256,7 @@ void benchmarkMode()
 	T_med = e_med;
 	t_med = a_star_times[median];
 	constant = T_med / (double)t_med;
-
+	cout << "A* c: " << constant << endl;
 	a_star_q[median] = 1.0;
 	for (int i = 0; i < no_test; ++i)
 	{
@@ -258,7 +266,7 @@ void benchmarkMode()
 		a_star_q[i] = q / T;
 	}
 
-	char* alg_names[3] = { "BFS O(V+E)" , "Dijkstra O(E*logV)" , "A* O(E)" };
+	vector<string> alg_names = { "BFS O(V+E)" , "Dijkstra O(E*logV)" , "A* O(E)" };
 
 	for (int k = 0; k < 3; ++k)
 	{
@@ -289,7 +297,7 @@ void benchmarkMode()
 
 int main(int argc, char* argv[])
 {
-	if (argc != 2)
+	if (argc < 2 || argc > 3)
 	{
 		printUsage(argv[0]);
 		exit(1);
@@ -299,26 +307,39 @@ int main(int argc, char* argv[])
 	Raster* rptr = nullptr;
 
 	string mode = argv[1];
+	string nd = "";
 
-	if (mode == "1")
+	if(argc == 3)
+		nd = argv[2];
+	if(nd == "-nd")
+		disable_draw = true; // sets global flag
+
+	try
 	{
-		fromStdinMode();
-		return 0;
+		if (mode == "1")
+		{
+			fromStdinMode();
+			return 0;
+		}
+		else if (mode == "2")
+		{
+			autoGeneratedMode(false);
+			return 0;
+		}
+		else if (mode == "3")
+		{
+			benchmarkMode();
+			return 0;
+		}
+		else
+		{
+			printUsage(argv[0]);
+			exit(0);
+		}
 	}
-	else if (mode == "2")
+	catch(exception& e)
 	{
-		autoGeneratedMode(false);
-		return 0;
-	}
-	else if (mode == "3")
-	{
-		benchmarkMode();
-		return 0;
-	}
-	else
-	{
-		printUsage(argv[0]);
-		exit(0);
+		cout << "Exception: " << e.what() << endl;
 	}
 
 	delete rptr;

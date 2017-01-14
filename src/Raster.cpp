@@ -76,7 +76,7 @@ void Raster::createMaze(Location start, int& vertices, int& edges)
 		/* randomize step length between 2,4,6,8 */
 		// constant step with value 2 results in labirynth
 		step = mt_rand();
-		std::cout << step;
+		//std::cout << step;
 		if (v - step < 0)
 			step = v;
 
@@ -89,8 +89,8 @@ void Raster::createMaze(Location start, int& vertices, int& edges)
 			switch (moves[0])
 			{
 			case 1: // Down
-				std::cout << "move down from " << curTile.first << "," << curTile.second << 
-					" to " << curTile.first + step << "," << curTile.second << std::endl;
+/*				std::cout << "move down from " << curTile.first << "," << curTile.second <<
+					" to " << curTile.first + step << "," << curTile.second << std::endl;*/
 				temp.first = curTile.first + step;
 				temp.second = curTile.second;
 
@@ -121,8 +121,8 @@ void Raster::createMaze(Location start, int& vertices, int& edges)
 				break;
 
 			case 2: // Up
-				std::cout << "move up from " << curTile.first << "," << curTile.second <<
-					" to " << curTile.first - step << "," << curTile.second << std::endl;
+/*				std::cout << "move up from " << curTile.first << "," << curTile.second <<
+					" to " << curTile.first - step << "," << curTile.second << std::endl;*/
 				temp.first = curTile.first - step;
 				temp.second = curTile.second;
 
@@ -149,8 +149,8 @@ void Raster::createMaze(Location start, int& vertices, int& edges)
 				break;
 
 			case 3: // Left
-				std::cout << "move left from " << curTile.first << "," << curTile.second <<
-					" to " << curTile.first << "," << curTile.second-step << std::endl;
+/*				std::cout << "move left from " << curTile.first << "," << curTile.second <<
+					" to " << curTile.first << "," << curTile.second-step << std::endl;*/
 				temp.first = curTile.first;
 				temp.second = curTile.second - step;
 
@@ -178,8 +178,8 @@ void Raster::createMaze(Location start, int& vertices, int& edges)
 				break;
 
 			case 4: // Right
-				std::cout << "move right from " << curTile.first << "," << curTile.second <<
-					" to " << curTile.first << "," << curTile.second+step << std::endl;
+/*				std::cout << "move right from " << curTile.first << "," << curTile.second <<
+					" to " << curTile.first << "," << curTile.second+step << std::endl;*/
 				temp.first = curTile.first;
 				temp.second = curTile.second + step;
 
@@ -200,7 +200,7 @@ void Raster::createMaze(Location start, int& vertices, int& edges)
 					v -= 1;
 					e -= newEdges;
 				}
-				
+
 				//curTile = temp;
 				//tileList.push(curTile);
 
@@ -214,7 +214,7 @@ void Raster::createMaze(Location start, int& vertices, int& edges)
 		{
 			if (exitPlaced == false && v == vertices/2)
 			{
-				std::cout << "placing exit " << std::endl;
+				//std::cout << "placing exit " << std::endl;
 				grid[curTile.first][curTile.second] = 1;
 				exitPlaced = true;
 				this->end = curTile;
