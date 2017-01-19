@@ -1,3 +1,11 @@
+/**
+ * Finding shortest path between points on square grid.
+ *
+ * @file AlgorithmBase.cpp
+ * @brief Definitions of base classes for path-finding algorithms.
+ * @author Wiktor Franus
+ */
+
 #include "../include/AlgorithmBase.hpp"
 #include <iostream>
 
@@ -32,7 +40,6 @@ vector<AlgorithmBase::Location> AlgorithmBase::getPath()
 		current = parent[current.first][current.second];
 	}
 	//path.push_back(raster->getStart()); // optional, not preffered when drawing image
-	//std::reverse(path.begin(), path.end()); // not necessary for drawing
 	return path;
 
 }

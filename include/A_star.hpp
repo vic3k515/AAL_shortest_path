@@ -1,16 +1,40 @@
+/**
+ * Finding shortest path between points on square grid.
+ *
+ * @file A_star.hpp
+ * @brief Implementation of A* path-finding algorithm.
+ * @author Wiktor Franus
+ */
+
 #pragma once
 #include "AlgorithmBase.hpp"
 
 class A_star : public AlgorithmWithPriorityQueue
 {
 public:
+	/**
+	 * Constructor that calls AlgorithmWithPriorityQueue constructor.
+	 * @param raster_ pointer to grid
+	 */
 	A_star(Raster* raster_) : AlgorithmWithPriorityQueue(raster_) {};
 	~A_star() {};
 
+	/**
+	 * Returns distance bettwen location a and b.
+	 * Returned value is Manhattan distance between points.
+	 * @param a source location
+	 * @param b destination location
+	 * @return Manhattan distance between locations
+	 */
 	double heuristic(Location a, Location b) {
 		return abs(a.first - b.first) + abs(a.second - b.second);
 	}
 
+	/**
+	 * Finds shortest path between two locations on raster.
+	 * @param from Start point
+	 * @param to End point
+	 */
 	void shortestPath(const Location& from, const Location& to)
 	{
 		PriorityQueue<Location, int> priorQueue;

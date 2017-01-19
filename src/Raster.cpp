@@ -1,8 +1,17 @@
+/**
+ * Finding shortest path between points on square grid.
+ *
+ * @file Raster.cpp
+ * @brief Definition of class representing square grid.
+ * @author Wiktor Franus
+ */
+
 #include "../include/Raster.hpp"
+#include <iostream>
 
 // initialize static member
-array<Raster::Location, 4> Raster::DIRS{ std::make_pair(1, 0), std::make_pair(0, -1),
-										 std::make_pair(0, 1), std::make_pair(-1, 0) };
+array<Raster::Location, 4> Raster::DIRS{ std::make_pair(1, 0), std::make_pair(-1, 0),
+										 std::make_pair(0, -1), std::make_pair(0, 1) };
 
 Raster::Raster(int width_, int height_) : width(width_), height(height_)
 {
@@ -11,11 +20,35 @@ Raster::Raster(int width_, int height_) : width(width_), height(height_)
 		grid[i] = new int[width_](); //initializes grid with 0s (walls)
 }
 
+Raster::Raster(const Raster& other) : width(other.width), height(other.height)
+{
+	grid = new int*[height];
+	for (int i = 0; i < height; ++i)
+	{
+		grid[i] = new int[width];
+		for(int j=0; j<width; ++j)
+			grid[i][j] = other.grid[i][j];
+	}
+}
+
 Raster::~Raster()
 {
 	for (int i = 0; i < height; ++i)
 		delete[] grid[i];
 	delete[] grid;
+}
+
+bool Raster::is_valid(Location id) const
+{
+	int x = id.first;
+	int y = id.second;
+	return 0 <= x && x < height && 0 <= y && y < width && grid[x][y] == 1;
+}
+bool Raster::is_wall(Location id) const
+{
+	int x = id.first;
+	int y = id.second;
+	return 0 <= x && x < height && 0 <= y && y < width && grid[x][y] == 0;
 }
 
 void Raster::findMoves(Location curTile, vector<int>& moves, int step)
@@ -34,13 +67,13 @@ void Raster::findMoves(Location curTile, vector<int>& moves, int step)
 			++counter_right;
 	}
 	if(counter_down==step)
-		moves.push_back(1);
+		moves.push_back(0);
 	if (counter_up == step)
-		moves.push_back(2);
+		moves.push_back(1);
 	if (counter_left == step)
-		moves.push_back(3);
+		moves.push_back(2);
 	if (counter_right == step)
-		moves.push_back(4);
+		moves.push_back(3);
 
 	random_shuffle(moves.begin(), moves.end());
 }
@@ -72,107 +105,26 @@ void Raster::createMaze(Location start, int& vertices, int& edges)
 
 		if (!moves.empty())
 		{
-			Location temp, on_path;
-			switch (moves[0])
+			Location on_path;
+			int newEdges;
+			int dir = moves[0];
+			on_path.first = curTile.first;
+			on_path.second = curTile.second;
+
+			for (int i = 1; i <= step; ++i)
 			{
-			case 1: // Down
-				temp.first = curTile.first + step;
-				temp.second = curTile.second;
-
-				for (int i = 1; i <= step; ++i)
-				{
-					on_path.first = curTile.first + i;
-					on_path.second = curTile.second;
-					int newEdges = countNewEdges(on_path);
-					// don't do step of lenght i if it creates too many new edges
-					if ((e - newEdges) < 0)
-					{
-						temp.first = curTile.first + i - 1;
-						break;
-					}
-					grid[curTile.first + i][curTile.second] = 1;
-					tileList.emplace(on_path);
-					v -= 1;
-					e -= newEdges;
-				}
-
-				break;
-
-			case 2: // Up
-				temp.first = curTile.first - step;
-				temp.second = curTile.second;
-
-				for (int i = 1; i <= step; ++i)
-				{
-					on_path.first = curTile.first - i;
-					on_path.second = curTile.second;
-					int newEdges = countNewEdges(on_path);
-					// don't do step of lenght i if it creates too many new edges
-					if ((e - newEdges) < 0)
-					{
-						temp.first = curTile.first - i + 1;
-						break;
-					}
-					grid[curTile.first - i][curTile.second] = 1;
-					tileList.emplace(on_path);
-					v -= 1;
-					e -= newEdges;
-				}
-
-				break;
-
-			case 3: // Left
-				temp.first = curTile.first;
-				temp.second = curTile.second - step;
-
-				for (int i = 1; i <= step; ++i)
-				{
-					on_path.first = curTile.first;
-					on_path.second = curTile.second - i;
-					int newEdges = countNewEdges(on_path);
-					/// don't do step of lenght i if it creates too many new edges
-					if ((e - newEdges) < 0)
-					{
-						std::cout << "LEFT" << std::endl;
-						temp.second = curTile.second - i + 1;
-						break;
-					}
-					grid[curTile.first][curTile.second - i] = 1;
-					tileList.emplace(on_path);
-					v -= 1;
-					e -= newEdges;
-				}
-
-				break;
-
-			case 4: // Right
-				temp.first = curTile.first;
-				temp.second = curTile.second + step;
-
-				for (int i = 1; i <= step; ++i)
-				{
-					on_path.first = curTile.first;
-					on_path.second = curTile.second + i;
-					int newEdges = countNewEdges(on_path);
-					// don't do step of lenght i if it creates too many new edges
-					if ((e - newEdges) < 0)
-					{
-						std::cout << "RIGHT" << tileList.top().first << "," << tileList.top().second << std::endl;
-						temp.second = curTile.second + i - 1;
-						break;
-					}
-					grid[curTile.first][curTile.second + i] = 1;
-					tileList.emplace(on_path);
-					v -= 1;
-					e -= newEdges;
-				}
-
-				break;
-			}//switch
-
-			curTile = tileList.top();
-			tileList.pop();
-		}//if
+				on_path.first += DIRS[dir].first;
+				on_path.second += DIRS[dir].second;
+				newEdges = countNewEdges(on_path);
+				// don't do step of lenght i if it creates too many new edges
+				if ((e - newEdges) < 0)
+					break;
+				grid[on_path.first][on_path.second] = 1;
+				tileList.emplace(on_path);
+				v -= 1;
+				e -= newEdges;
+			}
+		}
 		else
 		{
 			if (exitPlaced == false && v == vertices/2)
@@ -181,10 +133,11 @@ void Raster::createMaze(Location start, int& vertices, int& edges)
 				exitPlaced = true;
 				this->end = curTile;
 			}
-			curTile = tileList.top();
-			tileList.pop();
 		}
-	}
+
+		curTile = tileList.top();
+		tileList.pop();
+	}//while
 	if (exitPlaced == false)
 	{
 		grid[curTile.first][curTile.second] = 1;
@@ -237,7 +190,7 @@ bool Raster::readStartAndEnd()
 	}
 	return true;
 }
-/* -------------*/
+
 vector<Raster::Location> Raster::neighbours(Location id) const
 {
 	int x, y, dx, dy;

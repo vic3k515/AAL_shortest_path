@@ -1,3 +1,11 @@
+/**
+ * Finding shortest path between points on square grid.
+ *
+ * @file draw.hpp
+ * @brief Definition of function which uses CImg library to draw an image.
+ * @author Wiktor Franus
+ */
+
 #pragma once
 #include "../lib/CImg.h"
 #include "../include/Raster.hpp"
@@ -20,10 +28,6 @@ void drawResult(int width, int height, Raster* rptr, std::vector<std::pair<int,i
 		blue[] = { 0,0,255 },
 		black[] = { 0,0,0 },
 		white[] = { 255,255,255 };
-
-
-	// Handle display window resizing (if any)
-	//draw_disp.resize();
 
 	// Create and display the image of raster and path
 	CImg<unsigned char> img(draw_disp.width(), draw_disp.height(), 1, 3, 0);
@@ -54,5 +58,6 @@ void drawResult(int width, int height, Raster* rptr, std::vector<std::pair<int,i
 	while (!draw_disp.is_closed() && !draw_disp.is_keyESC() && !draw_disp.is_keyQ())
 	{
 		// wait for windows close or ESC press or Q press
+		draw_disp.wait();
 	}
 }

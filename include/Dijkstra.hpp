@@ -1,12 +1,32 @@
+/**
+ * Finding shortest path between points on square grid.
+ *
+ * @file Dijkstra.hpp
+ * @brief Implementation of Dijkstra path-finding algorithm.
+ * @author Wiktor Franus
+ */
+
 #pragma once
 #include "AlgorithmBase.hpp"
 
 class Dijkstra : public AlgorithmWithPriorityQueue
 {
   public:
+ 	/**
+	 * Constructor that calls AlgorithmWithPriorityQueue constructor.
+	 * @param raster_ pointer to grid
+	 */
 	Dijkstra(Raster* raster_) : AlgorithmWithPriorityQueue(raster_) {};
+	/**
+	 * Default destructor.
+	 */
 	~Dijkstra() {};
 
+	/**
+	 * Finds shortest path between two locations on raster.
+	 * @param from Start point
+	 * @param to End point
+	 */
 	void shortestPath(const Location& from, const Location& to)
 	{
 		PriorityQueue<Location, int> priorQueue;
@@ -23,7 +43,6 @@ class Dijkstra : public AlgorithmWithPriorityQueue
 
 			for (auto next : raster->neighbours(current))
 			{
-
 				int new_cost = distance[current.first][current.second] + 1;
 				if (new_cost < distance[next.first][next.second])
 				{
