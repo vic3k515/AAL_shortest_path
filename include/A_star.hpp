@@ -7,13 +7,13 @@ public:
 	A_star(Raster* raster_) : AlgorithmWithPriorityQueue(raster_) {};
 	~A_star() {};
 
-	inline double heuristic(intPair a, intPair b) {
+	double heuristic(Location a, Location b) {
 		return abs(a.first - b.first) + abs(a.second - b.second);
 	}
 
-	void shortestPath(const intPair& from, const intPair& to)
+	void shortestPath(const Location& from, const Location& to)
 	{
-		PriorityQueue<intPair, int> priorQueue;
+		PriorityQueue<Location, int> priorQueue;
 		parent[from.first][from.second] = from;
 		distance[from.first][from.second] = 0;
 		priorQueue.put(from, 0);
@@ -23,10 +23,7 @@ public:
 			auto current = priorQueue.get();
 
 			if (current == to)
-			{
-				//AlgorithmBase::printPath(from, to);
 				break;
-			}
 
 			for (auto next : raster->neighbours(current))
 			{

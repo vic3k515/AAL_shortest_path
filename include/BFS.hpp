@@ -5,11 +5,10 @@ using std::queue;
 class BFS : public AlgorithmBase
 {
 public:
-	using Location=AlgorithmBase::intPair;
 	BFS(Raster* raster_) : AlgorithmBase(raster_) {};
 	~BFS() {};
 
-	void shortestPath(const intPair& from, const intPair& to)
+	void shortestPath(const Location& from, const Location& to)
 	{
 		queue<Location> queue;
 		queue.emplace(from);
@@ -21,18 +20,13 @@ public:
 			queue.pop();
 
 			if (current == to)
-			{
-				//AlgorithmBase::printPath(from, to);
 				break;
-			}
 
 			for (auto next : raster->neighbours(current))
 			{
 			  if (parent[next.first][next.second] == nullPair)
 			  {
 				  queue.emplace(next);
-				 //std::cout << temp << " c: (" << current.first << "," << current.second << ") "  << " c_un: (" << temp1.first << "," << temp1.second << ") "
-					// << raster->getVal(temp1) << " n: (" << next.first << "," << next.second << ") " << raster->getVal(next) << std::endl;
 				  parent[next.first][next.second] = current;
 			  }
 			}

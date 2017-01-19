@@ -3,7 +3,6 @@
 #include <array>
 #include <vector>
 #include <iostream>
-#include <stdlib.h>
 #include <time.h>
 #include <stack>
 #include <chrono>
@@ -13,11 +12,12 @@
 
 using std::vector;
 using std::array;
+using std::pair;
 
 class Raster
 {
 public:
-	typedef std::pair<int, int> Location;
+	typedef pair<int, int> Location;
 	static array<Location, 4> DIRS;
 
 	Raster(int width_, int height_);
@@ -45,15 +45,14 @@ public:
 	bool readStartAndEnd();
 	bool readGrid();
 	void generateGrid(int& vertices, int& edges);
-	void draw();
-	void clear();
-	void neighbors2(Location curTile, vector<int>& moves, int field_width);
+	void findMoves(Location curTile, vector<int>& moves, int field_width);
 	void createMaze(Location start_point, int& vertices, int& edges);
 	int countNewEdges(Location loc);
 	vector<Location> neighbours(Location id) const;
 
 private:
-	Location start = {0, 0}, end = {0, 0};
+	Location start = {0, 0};
+	Location end = {0, 0};
 	int width, height;
 	int **grid; //2D int array
 };

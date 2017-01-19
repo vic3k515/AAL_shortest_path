@@ -1,13 +1,14 @@
 #include "../include/Raster.hpp"
 
-std::array<Raster::Location, 4> Raster::DIRS{ std::make_pair(1, 0), std::make_pair(0, -1),
-											  std::make_pair(-1, 0), std::make_pair(0, 1) };
+// initialize static member
+array<Raster::Location, 4> Raster::DIRS{ std::make_pair(1, 0), std::make_pair(0, -1),
+										 std::make_pair(0, 1), std::make_pair(-1, 0) };
 
 Raster::Raster(int width_, int height_) : width(width_), height(height_)
 {
 	grid = new int*[height_];
 	for (int i = 0; i < height_; ++i)
-		grid[i] = new int[width_]();
+		grid[i] = new int[width_](); //initializes grid with 0s (walls)
 }
 
 Raster::~Raster()
@@ -17,38 +18,28 @@ Raster::~Raster()
 	delete[] grid;
 }
 
-void Raster::neighbors2(Location curTile, vector<int>& moves, int step)
+void Raster::findMoves(Location curTile, vector<int>& moves, int step)
 {
-	int counter = 0;
-	//down
+	int counter_down = 0, counter_up = 0, counter_left = 0, counter_right = 0;
+
 	for(int i = 1; i <= step; ++i)
+	{
 		if (is_wall(Location(curTile.first + i, curTile.second)))
-			++counter;
-	if(counter==step)
-		moves.push_back(1);
-	counter = 0;
-
-	//up
-	for (int i = 1; i <= step; ++i)
+			++counter_down;
 		if (is_wall(Location(curTile.first - i, curTile.second)))
-			++counter;
-	if (counter == step)
-		moves.push_back(2);
-	counter = 0;
-
-	// left
-	for (int i = 1; i <= step; ++i)
+			++counter_up;
 		if (is_wall(Location(curTile.first, curTile.second - i)))
-			++counter;
-	if (counter == step)
-		moves.push_back(3);
-	counter = 0;
-
-	// right
-	for (int i = 1; i <= step; ++i)
+			++counter_left;
 		if (is_wall(Location(curTile.first, curTile.second + i)))
-			++counter;
-	if (counter == step)
+			++counter_right;
+	}
+	if(counter_down==step)
+		moves.push_back(1);
+	if (counter_up == step)
+		moves.push_back(2);
+	if (counter_left == step)
+		moves.push_back(3);
+	if (counter_right == step)
 		moves.push_back(4);
 
 	random_shuffle(moves.begin(), moves.end());
@@ -67,21 +58,17 @@ void Raster::createMaze(Location start, int& vertices, int& edges)
 	--v;
 
 	auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-	//std::cout << "createMaze seed: " << seed << std::endl;
-	// fixed seed: 30570839605938
 	auto mt_rand = std::bind(std::uniform_int_distribution<int>(1, 3), std::mt19937(seed));
 
 	while (v>0 && e>0 && !tileList.empty())
 	{
-		/* randomize step length between 2,4,6,8 */
-		// constant step with value 2 results in labirynth
+		/* randomize step length between 1,2,3 */
 		step = mt_rand();
-		//std::cout << step;
 		if (v - step < 0)
 			step = v;
 
 		vector<int> moves;
-		neighbors2(curTile, moves, step);
+		findMoves(curTile, moves, step);
 
 		if (!moves.empty())
 		{
@@ -89,8 +76,6 @@ void Raster::createMaze(Location start, int& vertices, int& edges)
 			switch (moves[0])
 			{
 			case 1: // Down
-/*				std::cout << "move down from " << curTile.first << "," << curTile.second <<
-					" to " << curTile.first + step << "," << curTile.second << std::endl;*/
 				temp.first = curTile.first + step;
 				temp.second = curTile.second;
 
@@ -99,7 +84,7 @@ void Raster::createMaze(Location start, int& vertices, int& edges)
 					on_path.first = curTile.first + i;
 					on_path.second = curTile.second;
 					int newEdges = countNewEdges(on_path);
-					// don't do step if it creates too many new edges
+					// don't do step of lenght i if it creates too many new edges
 					if ((e - newEdges) < 0)
 					{
 						temp.first = curTile.first + i - 1;
@@ -111,18 +96,9 @@ void Raster::createMaze(Location start, int& vertices, int& edges)
 					e -= newEdges;
 				}
 
-				//if (curTile == temp) break;
-				// even if no move was made, push curTile to stack -
-				// when analyzed next time, move with
-				// different length might be valid
-				//curTile = temp;
-				//tileList.push(curTile);
-
 				break;
 
 			case 2: // Up
-/*				std::cout << "move up from " << curTile.first << "," << curTile.second <<
-					" to " << curTile.first - step << "," << curTile.second << std::endl;*/
 				temp.first = curTile.first - step;
 				temp.second = curTile.second;
 
@@ -131,7 +107,7 @@ void Raster::createMaze(Location start, int& vertices, int& edges)
 					on_path.first = curTile.first - i;
 					on_path.second = curTile.second;
 					int newEdges = countNewEdges(on_path);
-					// don't do step if it creates too many new edges
+					// don't do step of lenght i if it creates too many new edges
 					if ((e - newEdges) < 0)
 					{
 						temp.first = curTile.first - i + 1;
@@ -143,14 +119,9 @@ void Raster::createMaze(Location start, int& vertices, int& edges)
 					e -= newEdges;
 				}
 
-				//curTile = temp;
-				//tileList.push(curTile);
-
 				break;
 
 			case 3: // Left
-/*				std::cout << "move left from " << curTile.first << "," << curTile.second <<
-					" to " << curTile.first << "," << curTile.second-step << std::endl;*/
 				temp.first = curTile.first;
 				temp.second = curTile.second - step;
 
@@ -159,7 +130,7 @@ void Raster::createMaze(Location start, int& vertices, int& edges)
 					on_path.first = curTile.first;
 					on_path.second = curTile.second - i;
 					int newEdges = countNewEdges(on_path);
-					// don't do step if it creates too many new edges
+					/// don't do step of lenght i if it creates too many new edges
 					if ((e - newEdges) < 0)
 					{
 						std::cout << "LEFT" << std::endl;
@@ -172,14 +143,9 @@ void Raster::createMaze(Location start, int& vertices, int& edges)
 					e -= newEdges;
 				}
 
-				//curTile = temp;
-				//tileList.push(curTile);
-
 				break;
 
 			case 4: // Right
-/*				std::cout << "move right from " << curTile.first << "," << curTile.second <<
-					" to " << curTile.first << "," << curTile.second+step << std::endl;*/
 				temp.first = curTile.first;
 				temp.second = curTile.second + step;
 
@@ -201,9 +167,6 @@ void Raster::createMaze(Location start, int& vertices, int& edges)
 					e -= newEdges;
 				}
 
-				//curTile = temp;
-				//tileList.push(curTile);
-
 				break;
 			}//switch
 
@@ -214,7 +177,6 @@ void Raster::createMaze(Location start, int& vertices, int& edges)
 		{
 			if (exitPlaced == false && v == vertices/2)
 			{
-				//std::cout << "placing exit " << std::endl;
 				grid[curTile.first][curTile.second] = 1;
 				exitPlaced = true;
 				this->end = curTile;
@@ -323,41 +285,13 @@ bool Raster::readGrid()
 void Raster::generateGrid(int& vertices, int& edges)
 {
 	auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-	//std::cout << "generateGrid seed: " << seed << std::endl;
-	// seed 30714654709773
 	std::mt19937 mt_rand(seed);
 	int rand_x = mt_rand() % height;
 	int rand_y = mt_rand() % width;
 	this->start = Location(rand_x, rand_y);
 	grid[rand_x][rand_y] = 1;
-	//std::cout << "GENERATOR start point: ("  << rand_x << "," << rand_y << ")" << std::endl;
  	createMaze(this->start, vertices, edges);
+
 	// print number of vertices and edges used to build the maze:
 	std::cout << "v: " << vertices << " e: " << edges << std::endl;
-}
-
-void Raster::draw()
-{
-	for (int i = 0; i < height; ++i)
-	{
-		for (int j = 0; j < width; ++j)
-		{
-			if (i == this->start.first && j == start.second)
-				std::cout << "S";
-			else if (i == this->end.first && j == end.second)
-				std::cout << "E";
-			else if (grid[i][j] == 0)
-				std::cout << " ";
-			else
-				std::cout << "@" << "";
-		}
-		std::cout << std::endl;
-	}
-}
-
-void Raster::clear()
-{
-	for (int i = 0; i < height; ++i)
-		for (int j = 0; j < width; ++j)
-			grid[i][j] = 0;
 }

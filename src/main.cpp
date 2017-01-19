@@ -11,22 +11,6 @@ using namespace std::chrono;
 
 static bool disable_draw = false;
 
-//std::array<Raster::Location, 4> Raster::DIRS  {make_pair(1, 0), make_pair(0, -1),
-//										 make_pair(-1, 0), make_pair(0, 1)};
-/*
-void printParent(int **parent, int height, int width) {
-	for (int i = 0; i < height; ++i) {
-		for (int j = 0; j < width; ++j)
-			if (parent[i][j] == INT_MAX)
-				cout << "M" << " ";
-			else if (parent[i][j] >= width*height)
-				cout << "@" << " ";
-			else
-				cout << parent[i][j] << " ";;
-		cout << std::endl;
-	}
-}
-*/
 void printUsage(char* prog)
 {
 	cout << "usage: " << prog << " n <-nd>, where n is a mode number." << endl
@@ -37,23 +21,12 @@ void printUsage(char* prog)
 		<< "3 - benchmark mode (mode 2 with exec time measurement)." << endl
 		<< "-nd - disables image drawing."<< endl;
 }
-/*
-void runBFS(Raster* rptr, Raster::Location start, Raster::Location end)
-{
-	BFS bfs(rptr);
-	bfs.shortestPath(start, end);
-	vector<Raster::Location> shortest_path_1 = bfs.getPath();
-	cout << "Shortest path BFS(inversed): " << endl
-		<< "length: " << shortest_path_1.size() << endl;
-	drawResult(rptr->getWidth(), rptr->getHeight(), rptr, shortest_path_1);
-}*/
 
 void runAlgorithms(Raster* rptr, bool benchmark, vector<int>* bench_info=nullptr)
 {
 	high_resolution_clock::time_point t1, t2;
-	Raster::Location start, end;
-	start = rptr->getStart();
-	end = rptr->getEnd();
+	Raster::Location start = rptr->getStart();
+	Raster::Location end = rptr->getEnd();
 	int width = rptr->getWidth();
 	int height = rptr->getHeight();
 	BFS bfs(rptr);
@@ -64,11 +37,6 @@ void runAlgorithms(Raster* rptr, bool benchmark, vector<int>* bench_info=nullptr
 	cout << "End point: " << end.first << ", " << end.second << endl;
 
 	/* BFS */
-	//bfs.shortestPath(start, end);
-	//vector<Raster::Location> shortest_path_1 = bfs.getPath();
-	//cout << "Shortest path BFS(inversed): " << endl
-	//	<< "length: " << shortest_path_1.size() << endl;
-	//drawResult(width, height, rptr, shortest_path_1);
 	if (benchmark && bench_info!=nullptr)
 	{
 		t1 = high_resolution_clock::now();
@@ -81,7 +49,7 @@ void runAlgorithms(Raster* rptr, bool benchmark, vector<int>* bench_info=nullptr
 	else
 		bfs.shortestPath(start, end);
 	vector<Raster::Location> shortest_path_1 = bfs.getPath();
-	cout << "Shortest path BFS(inversed): " << endl
+	cout << "Shortest path BFS: " << endl
 		<< "length: " << shortest_path_1.size() << endl;
 	if(!disable_draw)
 		drawResult(width, height, rptr, shortest_path_1);
@@ -99,7 +67,7 @@ void runAlgorithms(Raster* rptr, bool benchmark, vector<int>* bench_info=nullptr
 	else
 		dijkstra.shortestPath(start, end);
 	vector<Raster::Location> shortest_path_2 = dijkstra.getPath();
-	cout << "Shortest path Dijkstra(inversed): " << endl
+	cout << "Shortest path Dijkstra: " << endl
 		<< "length: " << shortest_path_2.size() << endl;
 	if(!disable_draw)
 		drawResult(width, height, rptr, shortest_path_2);
@@ -117,7 +85,7 @@ void runAlgorithms(Raster* rptr, bool benchmark, vector<int>* bench_info=nullptr
 	else
 		a_star.shortestPath(start, end);
 	vector<Raster::Location> shortest_path_3 = a_star.getPath();
-	cout << "Shortest path A*(inversed): " << endl
+	cout << "Shortest path A*: " << endl
 		<< "length: " << shortest_path_3.size() << endl;
 	if(!disable_draw)
 		drawResult(width, height, rptr, shortest_path_3);
@@ -201,69 +169,65 @@ void benchmarkMode()
 		a_star_times.push_back(*it);
 	}
 	int no_test = vertices.size();
+	bfs_q.resize(no_test);
+	dijkstra_q.resize(no_test);
+	a_star_q.resize(no_test);
 
 	// find median index
-	if (no_test == 1)
-		median = 0;
-	else if (no_test % 2 == 0)
+	if (no_test % 2 == 0)
 		median = (no_test / 2) - 1;
 	else
 		median = no_test / 2;
 
 	v_med = vertices[median];
 	e_med = edges[median];
+	/*
 	cout << "median: " << median
 		<< " v_med: " << v_med
 		<< " e_med: " << e_med << endl;
-
-	/*
-	q = (t(n) * T(n_median) / (T(n) * t(n_median))
 	*/
 
-	bfs_q.resize(no_test);
-	dijkstra_q.resize(no_test);
-	a_star_q.resize(no_test);
+	/**
+	 * q = (t(n) * T(n_median) / (T(n) * t(n_median))
+	 */
 
 	// BFS - O(V+E)
 	T_med = v_med + e_med;
 	t_med = bfs_times[median];
 	double constant = T_med / (double)t_med;
-	cout << "BFS c: " << constant << endl;
+	//cout << "BFS c: " << constant << endl;
 	bfs_q[median] = 1.0;
 	for (int i = 0; i < no_test; ++i)
 	{
 		if (i == median) continue;
 		T = vertices[i] + edges[i];
-		q = ((double)bfs_times[i]) * constant;
-		bfs_q[i] = q / T;
+		bfs_q[i] = (bfs_times[i] * constant) / T;
 	}
 
 	// Dijkstra - O(E*logV)
 	T_med = (double)e_med * log((double)v_med);
 	t_med = dijkstra_times[median];
 	constant = T_med / (double)t_med;
-	cout << "Dijkstra c: " << constant << endl;
+	//cout << "Dijkstra c: " << constant << endl;
 	dijkstra_q[median] = 1.0;
 	for (int i = 0; i < no_test; ++i)
 	{
 		if (i == median) continue;
-		T = (double)edges[i] * log((double)vertices[i]);
-		q = (double)dijkstra_times[i] * constant;
-		bfs_q[i] = q / T;
+		T = edges[i] * log((double)vertices[i]);
+		dijkstra_q[i] = (dijkstra_times[i] * constant) / T;
 	}
 
 	// A* - O(E)
 	T_med = e_med;
 	t_med = a_star_times[median];
 	constant = T_med / (double)t_med;
-	cout << "A* c: " << constant << endl;
+	//cout << "A* c: " << constant << endl;
 	a_star_q[median] = 1.0;
 	for (int i = 0; i < no_test; ++i)
 	{
 		if (i == median) continue;
 		T = edges[i];
-		q = (double)a_star_times[i] * constant;
-		a_star_q[i] = q / T;
+		a_star_q[i] = (a_star_times[i] * constant) / T;
 	}
 
 	vector<string> alg_names = { "BFS O(V+E)" , "Dijkstra O(E*logV)" , "A* O(E)" };

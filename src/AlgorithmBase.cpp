@@ -3,13 +3,12 @@
 
 AlgorithmBase::AlgorithmBase(Raster* raster_) : raster(raster_)
 {
-	parent = new intPair*[raster->getHeight()];
+	parent = new Location*[raster->getHeight()];
 	for (int i = 0; i < raster->getHeight(); ++i)
 	{
-		parent[i] = new intPair[raster->getWidth()];
+		parent[i] = new Location[raster->getWidth()];
 		std::fill(parent[i], parent[i] + raster->getWidth(), nullPair);
 	}
-
 }
 
 AlgorithmBase::~AlgorithmBase()
@@ -19,46 +18,26 @@ AlgorithmBase::~AlgorithmBase()
 	delete[] parent;
 }
 
-void AlgorithmBase::printPath(const intPair& begin, const intPair& from)
+vector<AlgorithmBase::Location> AlgorithmBase::getPath()
 {
-	int count = 0;
-	intPair curr = from;
-	while(curr != begin)
-	{
-		std::cout << "(" << curr.first << "," << curr.second << ") -> ";
-		curr = parent[curr.first][curr.second];
-		++count;
-	}
-	std::cout << "(" << begin.first << "," << begin.second << ")" << std::endl;
-	std::cout << " Length = " << count << std::endl;
-}
-
-vector<AlgorithmBase::intPair> AlgorithmBase::getPath()
-{
-	vector<intPair> path;
-	intPair current = raster->getEnd();
+	vector<Location> path;
+	Location current = raster->getEnd();
 	while (current != raster->getStart()) {
 		path.push_back(current);
 		if (current.first == nullPair.first || current.second == nullPair.second)
 		{
 			std::cout << "AlgorithmBase::getPath() error: wrong parent detected!" << std::endl;
-			return vector<intPair>();
+			return vector<Location>();
 		}
 		current = parent[current.first][current.second];
 	}
 	//path.push_back(raster->getStart()); // optional, not preffered when drawing image
 	//std::reverse(path.begin(), path.end()); // not necessary for drawing
 	return path;
-	
+
 }
 
-void AlgorithmBase::clearParent()
-{
-	for (int i = 0; i < raster->getHeight(); ++i)
-	{
-		std::fill(parent[i], parent[i] + raster->getWidth(), nullPair);
-	}
-}
+
 
 AlgorithmWithPriorityQueue::AlgorithmWithPriorityQueue(Raster * raster_) : AlgorithmBase(raster_)
 {

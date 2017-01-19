@@ -33,17 +33,15 @@ struct PriorityQueue {
 class AlgorithmBase
 {
   public:
-	typedef pair<int, int> intPair;
-	const intPair nullPair = intPair(INT_MAX,INT_MAX);
+	typedef Raster::Location Location;
+	const Location nullPair = Location(INT_MAX,INT_MAX);
 	AlgorithmBase(Raster* raster_);
 	~AlgorithmBase();
-	void shortestPath(const intPair& from, const intPair& to) {};
-	void printPath(const intPair& begin, const intPair& from);
-	vector<intPair> getPath();
-	void clearParent();
+	void shortestPath(const Location& from, const Location& to) {};
+	vector<Location> getPath();
 
   protected:
-	intPair **parent;	//2D array with hashes
+	Location **parent;	//2D array of Location
 	Raster* raster;
 };
 
@@ -52,7 +50,7 @@ class AlgorithmBase
 class AlgorithmWithPriorityQueue : public AlgorithmBase
 {
   public:
-	using AlgorithmBase::intPair;
+	using AlgorithmBase::Location;
 
 	AlgorithmWithPriorityQueue(Raster* raster_);
 	~AlgorithmWithPriorityQueue();
