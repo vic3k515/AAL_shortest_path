@@ -40,3 +40,9 @@
 # Build dirs
 /x64/
 /x86/
+
+# LaTeX compiled files
+*.aux
+*.log
+*.synctex.gz
+*.toc

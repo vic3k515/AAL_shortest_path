@@ -26,7 +26,6 @@ void drawResult(int width, int height, Raster* rptr, std::vector<std::pair<int,i
 		red[] = { 255,0,0 },
 		green[] = { 0,255,0 },
 		blue[] = { 0,0,255 },
-		black[] = { 0,0,0 },
 		white[] = { 255,255,255 };
 
 	// Create and display the image of raster and path

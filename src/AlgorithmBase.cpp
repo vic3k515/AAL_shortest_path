@@ -44,6 +44,11 @@ vector<AlgorithmBase::Location> AlgorithmBase::getPath()
 
 }
 
+void AlgorithmBase::clear()
+{
+	for (int i = 0; i < raster->getHeight(); ++i)
+		std::fill(parent[i], parent[i] + raster->getWidth(), nullPair);
+}
 
 
 AlgorithmWithPriorityQueue::AlgorithmWithPriorityQueue(Raster * raster_) : AlgorithmBase(raster_)
@@ -61,4 +66,11 @@ AlgorithmWithPriorityQueue::~AlgorithmWithPriorityQueue()
 	for (int i = 0; i < raster->getHeight(); ++i)
 		delete[] distance[i];
 	delete[] distance;
+}
+
+void AlgorithmWithPriorityQueue::clear()
+{
+	for (int i = 0; i < raster->getHeight(); ++i)
+		std::fill(distance[i], distance[i] + raster->getWidth(), INT_MAX);
+	AlgorithmBase::clear();
 }

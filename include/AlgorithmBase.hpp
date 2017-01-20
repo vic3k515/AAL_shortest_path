@@ -74,6 +74,11 @@ class AlgorithmBase
 	 * found by algorithm.
 	 */
 	vector<Location> getPath();
+	/**
+	 * Sets parent matrix to its initial state, so that path
+	 * finding can be run once again.
+	 */
+	void clear();
 
   protected:
   	/* 2d array containg parent Locations of i,jth element */
@@ -96,6 +101,8 @@ class AlgorithmWithPriorityQueue : public AlgorithmBase
 
 	AlgorithmWithPriorityQueue(Raster* raster_);
 	~AlgorithmWithPriorityQueue();
+
+	void clear();
 
   protected:
 	int** distance;	//priorities for queue

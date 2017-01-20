@@ -80,25 +80,24 @@ void Raster::findMoves(Location curTile, vector<int>& moves, int step)
 
 void Raster::createMaze(Location start, int& vertices, int& edges)
 {
-	bool exitPlaced = false;
-	int step;
+	int step, v_count=0, e_count=0;
+	Location end = start;
 	Location curTile = start;
 	std::stack<Location> tileList;
 	tileList.emplace(curTile);
 
-	int v = vertices, e = edges;
 	// start already put
-	--v;
+	++v_count;
 
 	auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 	auto mt_rand = std::bind(std::uniform_int_distribution<int>(1, 3), std::mt19937(seed));
 
-	while (v>0 && e>0 && !tileList.empty())
+	while (v_count<vertices && e_count<edges && !tileList.empty())
 	{
 		/* randomize step length between 1,2,3 */
 		step = mt_rand();
-		if (v - step < 0)
-			step = v;
+		if (v_count + step > vertices)
+			step = vertices - v_count;
 
 		vector<int> moves;
 		findMoves(curTile, moves, step);
@@ -116,37 +115,28 @@ void Raster::createMaze(Location start, int& vertices, int& edges)
 				on_path.first += DIRS[dir].first;
 				on_path.second += DIRS[dir].second;
 				newEdges = countNewEdges(on_path);
-				// don't do step of lenght i if it creates too many new edges
-				if ((e - newEdges) < 0)
+				// don't do step next step if it creates too many new edges
+				if ((e_count + newEdges) > edges)
 					break;
 				grid[on_path.first][on_path.second] = 1;
+				// push newly created vertex to stack
 				tileList.emplace(on_path);
-				v -= 1;
-				e -= newEdges;
-			}
-		}
-		else
-		{
-			if (exitPlaced == false && v == vertices/2)
-			{
-				grid[curTile.first][curTile.second] = 1;
-				exitPlaced = true;
-				this->end = curTile;
+				if(on_path >= end)
+					end = on_path;
+				v_count += 1;
+				e_count += newEdges;
 			}
 		}
 
 		curTile = tileList.top();
 		tileList.pop();
-	}//while
-	if (exitPlaced == false)
-	{
-		grid[curTile.first][curTile.second] = 1;
-		this->end = curTile;
 	}
 
+	this->end = end;
+
 	// update vertices and edge count to values actually used
-	vertices -= v;
-	edges -= e;
+	vertices = v_count;
+	edges = e_count;
 }
 
 int Raster::countNewEdges(Location loc)
@@ -173,7 +163,7 @@ bool Raster::readStartAndEnd()
 {
 	int x, y;
 	std::cin >> x >> y;
-	if (x >= 0 && x < height & y >= 0 && y < width && grid[x][y] == 1)
+	if (x >= 0 && x < height && y >= 0 && y < width && grid[x][y] == 1)
 		start = std::make_pair(x, y);
 	else
 	{
@@ -181,7 +171,7 @@ bool Raster::readStartAndEnd()
 		return false;
 	}
 	std::cin >> x >> y;
-	if (x >= 0 && x < height & y >= 0 && y < width && grid[x][y] == 1)
+	if (x >= 0 && x < height && y >= 0 && y < width && grid[x][y] == 1)
 		end = std::make_pair(x, y);
 	else
 	{
@@ -237,14 +227,11 @@ bool Raster::readGrid()
 
 void Raster::generateGrid(int& vertices, int& edges)
 {
-	auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-	std::mt19937 mt_rand(seed);
-	int rand_x = mt_rand() % height;
-	int rand_y = mt_rand() % width;
-	this->start = Location(rand_x, rand_y);
-	grid[rand_x][rand_y] = 1;
+	this->start = Location(0, 0);
+	grid[0][0] = 1;
  	createMaze(this->start, vertices, edges);
 
-	// print number of vertices and edges used to build the maze:
+	// print number of vertices and edges used to build the maze
+	// (vertices and edges variables are modified inside createMaze)
 	std::cout << "v: " << vertices << " e: " << edges << std::endl;
 }
