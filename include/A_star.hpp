@@ -26,7 +26,8 @@ public:
 	 * @param b destination location
 	 * @return Manhattan distance between locations
 	 */
-	double heuristic(Location a, Location b) {
+	double heuristic(const Location& a, const Location& b) const
+	{
 		return abs(a.first - b.first) + abs(a.second - b.second);
 	}
 
