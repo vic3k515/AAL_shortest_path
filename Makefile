@@ -1,5 +1,5 @@
 CXX=g++
-CXXFLAGS=-std=c++11 -O3 -lpthread -lX11 -Wall
+CXXFLAGS=-std=c++11 -O2 -lpthread -lX11 -Wall
 BIN=path.out
 
 all: $(OBJ)

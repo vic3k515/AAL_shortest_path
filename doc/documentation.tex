@@ -71,7 +71,6 @@ d – tablica zawierająca odleglość i-tego wierzchołka od s\\
 \begin{algorithmic}
 \Function{BFS}{$G,s,e$}
 	\For{wierzcholek $u$ w $G$} 
-		\State $u\gets nieodwiedzony$
    	\State $p[u]\gets nieokreslony$
    \EndFor
    
@@ -197,7 +196,7 @@ f[i] = d[i] + heurystyka(i,e) – wartość priorytetu dla i-tego wierzchołka\\
 \EndFunction
 \end{algorithmic}
 \subsubsection{Złożoność czasowa}
-Algorytm A* posiada najlepszą spośród wymienionych pesymistyczną złożoność czasową wynoszącą O(E).
+A* posiada najlepszą spośród wymienionych algorytmów pesymistyczną złożoność czasową wynoszącą O(E).
 
 \section{Algorytm generujący dane}
 Zgodnie z założeniami aplikacja umożliwia uruchomienie algorytmów na losowo wygenerowanym
@@ -207,9 +206,10 @@ go o możliwość rysowania rastra z zadaną ilością pól białych (wierzchoł
 łączących te pola (krawędzi grafu). W ten sposób użytkownik może określić nie tylko wielkość
 rastra, lecz również podać wymienione wyżej parametry opisujące graf, co umożliwia testowanie
 złożoności zaimplementowanych algorytmów.
-Początkowo raster wypełniony jest czarnymi polami. Losowany jest punkt startowy, od którego 
-rozpoczęte będzie tworzenie ścieżek. Punkt ten staje się pierwszym polem białym.
-Następnie algorytm działa według poniższych kroków:\\
+Początkowo raster wypełniony jest czarnymi polami. Tworzenie ścieżek rozpoczyna się od punktu
+startowego, którego współrzędne to 0,0 (lewy górny róg rastra). Punkt ten staje się pierwszym 
+polem białym. Punkt końcowy jest zainicjowany współrzędnymi pola startowego. Następnie algorytm
+działa według poniższych kroków:\\
 
 Dopóki raster zawiera pola czarne i nie osiągnięto zadanej liczby wierzchołków i krawędzi:
 \begin{enumerate}
@@ -220,15 +220,18 @@ Dopóki raster zawiera pola czarne i nie osiągnięto zadanej liczby wierzchołk
 	\item Jeśli krok o długości 1 w wylosowanym kierunku nie stworzy zbyt dużo nowych krawędzi:
 		\begin{enumerate}[label*=\arabic*.]
 		\item Zrób 1 krok w wylosowanym kierunku: zmień kolor pola na biały i dodaj pole do stosu
+		\item Jeśli obie współrzędne aktualnego pola są większe od współrzędnych punktu końcowego:
+				\begin{enumerate}[label*=\arabic*.]
+				\item Ustaw aktualne pole jako pole końcowe
+				\end{enumerate}
 		\end{enumerate}
 	\item Zwiększ licznik wierzchołków o 1 i licznik krawędzi o liczbę nowo utworzonych krawędzi
 	\end{enumerate}
 \item Zdejmij pole ze stosu
 \item Ustaw je jako aktualne pole
 \end{enumerate}
-W trakcie działania algorytmu jedno z utworzonych białych pól oznaczane jest jako końcowe.
-Moment wyboru tego pola został wybrany empirycznie i następuje wtedy, gdy
-algorytm postawił już połowę białych pól (połowę zadanej ilości wierzchołków).
+Po zakończeniu działania algorytmu odległość pomiędzy polami startowym i końcowym jest, w zależności od
+przypadku, zmaksymalizowana lub temu bliska.
 
 \section{Opis wykorzystanych struktur danych}
 \subsection{Raster}
@@ -259,7 +262,7 @@ współrzędnych i,j. Macierz ta jest aktualizowana podczas działania algorytmu
 najkrótszej ścieżki. Dzięki temu po zakończeniu działania algorytmu możliwe jest
 odtworzenie znalezionej ścieżki. Funkcja zwracająca znalezioną ścieżkę, korzystająca
 przy tym z macierzy poprzedników została przedstawiona w rozdziale \ref{bfs_pseudokod}.\\
-Algorytmy Dijkstra i A* posługują się dodatkowo macierzą odległości (dwuwymiarowa tablica
+Algorytmy Dijkstra i A* posługują się dodatkowo macierzą odległości (dwuwymiarową tablicą
 liczb całkowitych) zawierającą odległości punktu o współrzędnych i,j od punktu startowego. Początkowo
 wszystkie elementy tablicy zawierają liczbę INT\_MAX.
 
@@ -311,7 +314,7 @@ V    &      E    &      t(n)[us] &  q(n)  \\ \hline
 
 Zaprezentowane w tabeli rezultaty mogę wskazywać, że w ocenie złożoności teoretycznej algorytmu Dijkstry
 nastąpiło przeszacowanie (q malejące).
-
+\newpage
 \subsection{A*}
 \begin{longtable}{| m{1.7cm}| m{1.7cm} | m{1.7cm} | m{1.2cm} |}
 \hline
